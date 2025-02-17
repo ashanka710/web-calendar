@@ -1,25 +1,29 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+
 const app = express();
 const port = 3000;
 
-// Enable CORS for all routes
-app.use(cors());
+app.use(cors()); // Enable CORS for all routes
+app.use(bodyParser.json()); // Parse JSON request bodies
 
-// Body parser middleware to parse JSON bodies
-app.use(bodyParser.json());
+let tasks = []; // Temporary in-memory storage (Replace with a database in production)
 
-// Simple API endpoint for adding/removing tasks
-app.post('/api/tasks', (req, res) => {
-    const task = req.body;
-    // Here, you would store the task in a database
-    console.log('Received task:', task);
-    res.status(201).json({ message: 'Task added successfully', task });
+// Get all tasks
+app.get("/api/tasks", (req, res) => {
+    res.json(tasks);
 });
 
-app.get('/', (req, res) => {
-    res.send('Hello from the backend!');
+// Add a new task
+app.post("/api/tasks", (req, res) => {
+    const task = req.body;
+    if (!task.title || !task.priority) {
+        return res.status(400).json({ error: "Title and priority are required." });
+    }
+    tasks.push(task);
+    console.log("Task added:", task);
+    res.status(201).json({ message: "Task added successfully", task });
 });
 
 // Start the server
